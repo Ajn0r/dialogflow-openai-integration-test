@@ -1,52 +1,48 @@
-const functions = require('firebase-functions');
-const { WebhookClient } = require('dialogflow-fulfillment');
+const express = require('express');
+const bodyParser = require('body-parser');
 const axios = require('axios');
+const openai = require('openai');
 require('dotenv').config();
 
+const app = express();
+const PORT = process.env.PORT || 5000;
+
+app.use(bodyParser.json());
+
+// OpenAI API-nyckel
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
-process.env.DEBUG = 'dialogflow:debug'; // enables lib debugging statements
+// Öppna AI konfiguration
+const openaiConfig = {
+    apiKey: OPENAI_API_KEY,
+    engine: "text-davinci-002",
+    temperature: 0.7,
+    maxTokens: 100
+};
 
-exports.dialogflowFirebaseFulfillment = functions.https.onRequest((request, response) => {
-    const agent = new WebhookClient({ request, response });
-    console.log('Dialogflow Request headers: ' + JSON.stringify(request.headers));
-    console.log('Dialogflow Request body: ' + JSON.stringify(request.body));
+// POST-endpoint för Dialogflow webhook
+app.post('/webhook', async(req, res) => {
+    try {
+        const userInput = req.body.queryResult.queryText;
 
-    function welcome(agent) {
-        agent.add(`Welcome to my agent!`);
+        // Anropa OpenAI för att få svar på användarens inmatning
+        const response = await openai.Completion.create({
+            ...openaiConfig,
+            prompt: userInput + ' in one brief paragraph'
+        });
+
+        // Extrahera svarstext från OpenAI-responsen
+        const gptResponse = response.data.choices[0].text.trim();
+
+        // Returnera svaret till Dialogflow
+        res.json({ fulfillmentText: gptResponse });
+    } catch (error) {
+        console.error("Error:", error);
+        res.status(500).json({ fulfillmentText: "Ett fel inträffade" });
     }
+});
 
-    function fallback(agent) {
-        agent.add(`I didn't understand`);
-        agent.add(`I'm sorry, can you try again?`);
-    }
-
-    function handleUserInput(agent) {
-        const userInput = agent.query;
-        return axios.post('https://api.openai.com/v1/engines/davinci/completions', {
-                prompt: userInput,
-                engine: 'davinci',
-                max_tokens: 2048
-            }, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${OPENAI_API_KEY}`
-                }
-            })
-            .then(response => {
-                const gptResponse = response.data.choices[0].text;
-                agent.add(gptResponse);
-            })
-            .catch(error => {
-                console.error(error);
-                agent.add('An error occurred while processing your request');
-            });
-    }
-
-    let intentMap = new Map();
-    intentMap.set('Default Welcome Intent', welcome);
-    intentMap.set('Default Fallback Intent', fallback);
-    intentMap.set('Small talk', handleUserInput); // Replace 'User Input Intent' with the actual intent name where you expect user input
-
-    agent.handleRequest(intentMap);
+// Starta servern
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });

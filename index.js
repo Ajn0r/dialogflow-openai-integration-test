@@ -19,7 +19,7 @@ app.post('/webhook', (req, res) => {
         }, {
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer <OPENAI_API_KEY>`
+                'Authorization': `Bearer ${OPENAI_API_KEY}`
             }
         })
         .then(response => {

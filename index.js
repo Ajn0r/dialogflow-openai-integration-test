@@ -9,7 +9,7 @@ const app = express();
 app.use(bodyParser.json());
 
 app.post('/webhook', (req, res) => {
-    const userInput = req.body.queryResult.parameters.text;
+    const userInput = req.body.queryResult.text;
 
     // Skicka användarens inmatning till GPT-tjänsten för bearbetning
     axios.post('https://api.openai.com/v1/engines/davinci/completions', {

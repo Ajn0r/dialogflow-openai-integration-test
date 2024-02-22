@@ -47,12 +47,13 @@ webApp.get('/', (req, res) => {
 });
 
 webApp.post('/dialogflow', async(req, res) => {
-    console.log('Dialogflow request body:', req.body); // Lägg till denna loggning
+    console.log('Dialogflow request body:', req.body);
 
-    let action = req.body.queryResult.action;
+    let intentDisplayName = req.body.queryResult.intent.displayName;
     let queryText = req.body.queryResult.queryText;
 
-    if (action === 'input.unknown') {
+    if (intentDisplayName === 'gpt') {
+        // Använd OpenAI för att generera svar
         let result = await textGeneration(queryText);
         if (result.status == 1) {
             res.send({
@@ -65,10 +66,11 @@ webApp.post('/dialogflow', async(req, res) => {
         }
     } else {
         res.send({
-            fulfillmentText: `No handler for the action ${action}.`
+            fulfillmentText: `No handler for the intent ${intentDisplayName}.`
         });
     }
 });
+
 
 
 webApp.listen(PORT, () => {

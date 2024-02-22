@@ -60,7 +60,7 @@ webApp.post('/dialogflow', async(req, res) => {
         console.log(parameters.Grenar, language, parameters);
         let department = parameters.Grenar;
         const response = await handleDepartments(department, language);
-        res.json(response);
+        res.json({ fulfillmentText: response });
     } else if (supportedIntents.includes(intentDisplayName)) {
         // Använd OpenAI för att generera svar
         let result = await textGeneration(queryText);

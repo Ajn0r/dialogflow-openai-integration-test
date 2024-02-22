@@ -47,6 +47,8 @@ webApp.get('/', (req, res) => {
 });
 
 webApp.post('/dialogflow', async(req, res) => {
+    console.log('Dialogflow request body:', req.body); // Lägg till denna loggning
+
     let action = req.body.queryResult.action;
     let queryText = req.body.queryResult.queryText;
 
@@ -67,6 +69,7 @@ webApp.post('/dialogflow', async(req, res) => {
         });
     }
 });
+
 
 webApp.listen(PORT, () => {
     console.log(`Server is up and running at ${PORT}`);

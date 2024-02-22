@@ -9,8 +9,8 @@ const openai = new OpenAI(configuration);
 
 const textGeneration = async(prompt) => {
     try {
-        const response = await openai.complete({
-            engine: 'davinci',
+        const response = await openai.chat.completions.create({
+            engine: 'gpt-3.5-turbo',
             prompt: `Human: ${prompt}\nAI: `,
             temperature: 0.9,
             maxTokens: 500,
@@ -55,6 +55,7 @@ webApp.post('/dialogflow', async(req, res) => {
     if (intentDisplayName === 'gpt') {
         // Använd OpenAI för att generera svar
         let result = await textGeneration(queryText);
+
         if (result.status == 1) {
             res.send({
                 fulfillmentText: result.response

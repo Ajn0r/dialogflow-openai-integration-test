@@ -10,13 +10,10 @@ const openai = new OpenAI(configuration);
 const textGeneration = async(prompt) => {
     try {
         const response = await openai.chat.completions.create({
-            engine: 'gpt-3.5-turbo',
-            prompt: `Human: ${prompt}\nAI: `,
-            temperature: 0.9,
-            maxTokens: 500,
-            topP: 1,
-            frequencyPenalty: 0,
-            presencePenalty: 0.6,
+            model: 'gpt-3.5-turbo',
+            messages: [{ role: 'user', content: prompt }],
+            max_tokens: 150,
+            temperature: 0.7,
             stop: ['Human:', 'AI:']
         });
 
@@ -57,16 +54,16 @@ webApp.post('/dialogflow', async(req, res) => {
         let result = await textGeneration(queryText);
 
         if (result.status == 1) {
-            res.send({
+            res.json({
                 fulfillmentText: result.response
             });
         } else {
-            res.send({
+            res.json({
                 fulfillmentText: `Sorry, I'm not able to help with that.`
             });
         }
     } else {
-        res.send({
+        res.json({
             fulfillmentText: `No handler for the intent ${intentDisplayName}.`
         });
     }

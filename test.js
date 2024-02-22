@@ -10,13 +10,15 @@ const textGeneration = async(prompt) => {
     try {
         const response = await openai.chat.completions.create({
             model: 'gpt-3.5-turbo',
-            prompt: `Human: ${prompt}\nAI: `,
+            messages: [{ role: 'user', content: prompt }],
+            max_tokens: 150,
+            temperature: 0.7,
             stop: ['Human:', 'AI:']
         });
 
         return {
             status: 1,
-            response: `${response.choices[0].text}`
+            response: `${response.choices[0].message.content}`
         };
     } catch (error) {
         console.log(error);

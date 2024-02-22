@@ -1,39 +1,73 @@
 const express = require('express');
-const bodyParser = require('body-parser');
-const axios = require('axios');
+const { Configuration, OpenAI } = require("openai");
 require('dotenv').config();
-const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 
+const configuration = {
+    apiKey: process.env.OPENAI_API_KEY,
+};
+const openai = new OpenAI(configuration);
 
-const app = express();
-app.use(bodyParser.json());
-
-app.post('/webhook', (req, res) => {
-    const userInput = req.body.queryResult.text;
-
-    // Skicka användarens inmatning till GPT-tjänsten för bearbetning
-    axios.post('https://api.openai.com/v1/engines/davinci/completions', {
-            prompt: userInput,
+const textGeneration = async(prompt) => {
+    try {
+        const response = await openai.complete({
             engine: 'davinci',
-            max_tokens: 2048
-        }, {
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${OPENAI_API_KEY}`
-            }
-        })
-        .then(response => {
-            const gptResponse = response.data.choices[0].text;
-            // Skicka svaret från GPT-tjänsten tillbaka till Dialogflow
-            res.json({ fulfillmentText: gptResponse });
-        })
-        .catch(error => {
-            console.error(error);
-            res.json({ fulfillmentText: 'Ett fel inträffade' });
+            prompt: `Human: ${prompt}\nAI: `,
+            temperature: 0.9,
+            maxTokens: 500,
+            topP: 1,
+            frequencyPenalty: 0,
+            presencePenalty: 0.6,
+            stop: ['Human:', 'AI:']
         });
+
+        return {
+            status: 1,
+            response: `${response.choices[0].text}`
+        };
+    } catch (error) {
+        return {
+            status: 0,
+            response: ''
+        };
+    }
+};
+
+const webApp = express();
+const PORT = process.env.PORT || 3000; // Ange en standardport om PORT inte är satt
+
+webApp.use(express.urlencoded({ extended: true }));
+webApp.use(express.json());
+webApp.use((req, res, next) => {
+    console.log(`Path ${req.path} with Method ${req.method}`);
+    next();
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-    console.log(`Servern körs på port ${PORT}`);
+webApp.get('/', (req, res) => {
+    res.sendStatus(200);
+});
+
+webApp.post('/dialogflow', async(req, res) => {
+    let action = req.body.queryResult.action;
+    let queryText = req.body.queryResult.queryText;
+
+    if (action === 'input.unknown') {
+        let result = await textGeneration(queryText);
+        if (result.status == 1) {
+            res.send({
+                fulfillmentText: result.response
+            });
+        } else {
+            res.send({
+                fulfillmentText: `Sorry, I'm not able to help with that.`
+            });
+        }
+    } else {
+        res.send({
+            fulfillmentText: `No handler for the action ${action}.`
+        });
+    }
+});
+
+webApp.listen(PORT, () => {
+    console.log(`Server is up and running at ${PORT}`);
 });

@@ -43,13 +43,15 @@ webApp.get('/', (req, res) => {
     res.sendStatus(200);
 });
 
+const supportedIntents = ['Värnplikt', 'gpt', 'Söka jobb', 'Upphittad ammunition', 'Flygning med drönare'];
+
 webApp.post('/dialogflow', async(req, res) => {
     console.log('Dialogflow request body:', req.body);
 
     let intentDisplayName = req.body.queryResult.intent.displayName;
     let queryText = req.body.queryResult.queryText;
 
-    if (intentDisplayName === 'gpt') {
+    if (supportedIntents.includes(intentDisplayName)) {
         // Använd OpenAI för att generera svar
         let result = await textGeneration(queryText);
 
@@ -59,12 +61,12 @@ webApp.post('/dialogflow', async(req, res) => {
             });
         } else {
             res.json({
-                fulfillmentText: `Sorry, I'm not able to help with that.`
+                fulfillmentText: `Jag kan tyvärr inte svara på den frågan.`
             });
         }
     } else {
         res.json({
-            fulfillmentText: `No handler for the intent ${intentDisplayName}.`
+            fulfillmentText: `Jag förstår inte frågan. Ställ en annan fråga eller kontakta handläggare på Försvarsmakten via telefon: 08 - 788 75 00 eller e-post:  exp-hkv@mil.se.`
         });
     }
 });

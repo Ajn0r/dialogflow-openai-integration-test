@@ -1,12 +1,11 @@
 const express = require('express');
-const { Configuration, OpenAIApi } = require("openai");
+const { Configuration, OpenAI } = require("openai");
 require('dotenv').config();
 
-// Konfigurera inställningarna för OpenAI
-const configuration = {
-    apiKey: process.env.OPENAI_API_KEY
-};
-const openai = new OpenAIApi(configuration);
+const configuration = new Configuration({
+    apiKey: process.env.OPENAI_API_KEY,
+});
+const openai = new OpenAI(configuration);
 
 const textGeneration = async(prompt) => {
     try {
@@ -38,6 +37,10 @@ const PORT = process.env.PORT;
 
 webApp.use(express.urlencoded({ extended: true }));
 webApp.use(express.json());
+webApp.use((req, res, next) => {
+    console.log(`Path ${req.path} with Method ${req.method}`);
+    next();
+});
 
 webApp.get('/', (req, res) => {
     res.sendStatus(200);
@@ -50,16 +53,16 @@ webApp.post('/dialogflow', async(req, res) => {
     if (action === 'input.unknown') {
         let result = await textGeneration(queryText);
         if (result.status == 1) {
-            res.json({
+            res.send({
                 fulfillmentText: result.response
             });
         } else {
-            res.json({
+            res.send({
                 fulfillmentText: `Sorry, I'm not able to help with that.`
             });
         }
     } else {
-        res.json({
+        res.send({
             fulfillmentText: `No handler for the action ${action}.`
         });
     }

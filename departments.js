@@ -23,3 +23,5 @@ exports.handleDepartments = async(department, language) => {
         return `I don't understand the question. Ask another question or contact the Swedish Armed Forces via phone: 08 - 788 75 00 or e-mail:  exp-hkv@mil.se.`;
     }
 };
+
+module.exports = { handleDepartments };

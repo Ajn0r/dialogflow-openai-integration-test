@@ -57,6 +57,7 @@ webApp.post('/dialogflow', async(req, res) => {
 
     // If intent is "Grenar", call the department function in departments.js
     if (intentDisplayName === 'Grenar') {
+        console.log(parameters.Grenar, language, parameters);
         let department = parameters.Grenar;
         const response = await handleDepartments(department, language);
         res.json(response);

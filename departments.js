@@ -1,4 +1,4 @@
-exports.handleDepartments = async(department, language) => {
+const handleDepartments = async(department, language) => {
 
     if (language === 'sv') {
         if (department === 'Armén') {

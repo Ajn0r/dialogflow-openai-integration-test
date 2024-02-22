@@ -52,7 +52,7 @@ webApp.post('/dialogflow', async(req, res) => {
 
     let intentDisplayName = req.body.queryResult.intent.displayName;
     let queryText = req.body.queryResult.queryText;
-    let language = req.body.queryResult.parameters.languageCode;
+    let language = req.body.queryResult.languageCode;
     let parameters = req.body.queryResult.parameters;
 
     // If intent is "Grenar", call the department function in departments.js

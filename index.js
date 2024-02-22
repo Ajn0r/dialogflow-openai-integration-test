@@ -1,7 +1,7 @@
 const express = require('express');
 const { Configuration, OpenAI } = require("openai");
 require('dotenv').config();
-import { departments } from './departments.js';
+const { handleDepartments } = require('./departments.js');
 
 
 const configuration = {
@@ -56,9 +56,11 @@ webApp.post('/dialogflow', async(req, res) => {
     let parameters = req.body.queryResult.parameters;
 
     // If intent is "Grenar", call the department function in departments.js
-    departments.handleDepartments(parameters, language);
-
-    if (supportedIntents.includes(intentDisplayName)) {
+    if (intentDisplayName === 'Grenar') {
+        let department = parameters.Grenar;
+        const response = await handleDepartments(department, language);
+        res.json(response);
+    } else if (supportedIntents.includes(intentDisplayName)) {
         // Använd OpenAI för att generera svar
         let result = await textGeneration(queryText);
 

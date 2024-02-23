@@ -53,7 +53,7 @@ webApp.post('/dialogflow', async(req, res) => {
     let intentDisplayName = req.body.queryResult.intent.displayName;
     let language = req.body.queryResult.languageCode;
     let queryText = req.body.queryResult.queryText;
-    queryText += language === 'sv' ? ". Svara med max 150 tokens." : ". Answer with max 150 tokens.";
+    queryText += language === 'sv' ? ". Svara med max 150 tokens på svenska." : ". Answer with max 150 tokens in english.";
     let parameters = req.body.queryResult.parameters;
 
     // If intent is "Grenar", call the department function in departments.js

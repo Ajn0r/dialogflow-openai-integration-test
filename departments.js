@@ -18,15 +18,15 @@ const handleDepartments = async(department, language) => {
         }
     } else if (language === 'en') {
 
-        if (department.includes('Army')) {
+        if (department === 'Army') {
             return 'The Army is one of the three main branches of the Swedish Armed Forces. The Army is responsible for protecting Sweden and supporting society in times of crisis. The Army has a broad range of tasks and can be used in many different types of operations.' + ' ' +
 
                 'If you want to know more about the Army, you can check it out here: https://www.forsvarsmakten.se/en/about/organisation/the-army/. ';
-        } else if (department.contains('Air Force')) {
+        } else if (department === 'Air force') {
             return 'The Air Force is one of the three main branches of the Swedish Armed Forces. The Air Force is responsible for maintaining air space sovereignty over Sweden and for being able to carry out air operations throughout the country.' + ' ' +
 
                 'If you want to know more about the Air Force, you can check it out here: https://www.forsvarsmakten.se/en/about/organisation/the-air-force/. ';
-        } else if (department.contains('Navy')) {
+        } else if (department === 'The Navy') {
             return 'The Navy is one of the three main branches of the Swedish Armed Forces. The Navy is responsible for protecting Sweden\'s coasts and for being able to carry out operations at sea.' + ' ' +
 
                 'If you want to know more about the Navy, you can check it out here: https://www.forsvarsmakten.se/en/about/organisation/the-navy/. ';

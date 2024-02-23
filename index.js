@@ -14,7 +14,7 @@ const textGeneration = async(prompt) => {
         const response = await openai.chat.completions.create({
             model: 'gpt-3.5-turbo',
             messages: [{ role: 'user', content: prompt }],
-            max_tokens: 150,
+            max_tokens: 180,
             temperature: 0.7,
             stop: ['Human:', 'AI:']
         });
@@ -57,13 +57,13 @@ webApp.post('/dialogflow', async(req, res) => {
 
     // If intent is "Grenar", call the department function in departments.js
     if (intentDisplayName === 'Grenar') {
-        console.log(parameters.Grenar, language, parameters.Grenar.Grenar);
+        console.log(parameters.Grenar, language, parameters);
         let department = parameters.Grenar;
         const response = await handleDepartments(department, language);
         res.json({ fulfillmentText: response });
     } else if (supportedIntents.includes(intentDisplayName)) {
         // Använd OpenAI för att generera svar
-        let result = await textGeneration(queryText);
+        let result = await textGeneration(queryText + ". Svara på frågan utan att överstiga 180 ord.");
 
         if (result.status == 1) {
             res.json({

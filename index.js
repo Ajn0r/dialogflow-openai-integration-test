@@ -65,6 +65,7 @@ webApp.post('/dialogflow', async(req, res) => {
     } else if (supportedIntents.includes(intentDisplayName)) {
         // Använd OpenAI för att generera svar
         let result = await textGeneration(queryText);
+        console.log(queryText);
 
         if (result.status == 1) {
             res.json({

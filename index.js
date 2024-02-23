@@ -51,8 +51,9 @@ webApp.post('/dialogflow', async(req, res) => {
     console.log('Dialogflow request body:', req.body);
 
     let intentDisplayName = req.body.queryResult.intent.displayName;
-    let queryText = req.body.queryResult.queryText;
     let language = req.body.queryResult.languageCode;
+    let queryText = req.body.queryResult.queryText;
+    queryText += language === 'sv' ? ". Svara med max 180 ord." : ". Answer with max 180 words.";
     let parameters = req.body.queryResult.parameters;
 
     // If intent is "Grenar", call the department function in departments.js
@@ -63,7 +64,7 @@ webApp.post('/dialogflow', async(req, res) => {
         res.json({ fulfillmentText: response });
     } else if (supportedIntents.includes(intentDisplayName)) {
         // Använd OpenAI för att generera svar
-        let result = await textGeneration(queryText + ". Svara på frågan utan att överstiga 180 ord.");
+        let result = await textGeneration(queryText);
 
         if (result.status == 1) {
             res.json({
